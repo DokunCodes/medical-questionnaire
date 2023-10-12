@@ -12,13 +12,14 @@ export default {
         PencilIcon
     },
     props: {
-        questions: Array
+        questions: Array,
     },
     mounted() {
       //  console.log(this.questions);
-        console.log(this.$page.props);
+       console.log(this.$page.props.flash);
     },
     methods: {
+
         toggleOptions(question) {
             if (this.currentExpandedQuestion) {
                 this.currentExpandedQuestion.showOptions = false;
@@ -37,7 +38,15 @@ export default {
                 return;
             }
 
-            await this.$inertia.post(`/questions/${question.id}/delete`);
+            await this.$inertia.post(`/questions/${question.id}/delete`, {},{
+                onSuccess: (data) => {
+                    this.error = data.props.flash.error || null;
+                    this.message = data.props.flash.message || null;
+                },
+                onError: (data) => {
+                    console.log(data);
+                }
+            })
 
             const index = this.questions.findIndex(q => q.id === question.id);
             if (index > -1) {
@@ -56,9 +65,35 @@ export default {
         },
         async submitQuestion() {
             if (this.editing) {
-                await this.$inertia.put(`/questions/${this.editingQuestionId}`, this.newQuestion);
+                await this.$inertia.put(`/questions/${this.editingQuestionId}`, this.newQuestion, {
+                    onSuccess: (data) => {
+                        this.newQuestion = {
+                            question_text: '',
+                            question_rank: '',
+                            options: [{ text: '',next_question_id:'', recommendation: '' }]
+                        };
+                        this.error = data.props.flash.error || null;
+                        this.message = data.props.flash.message || null;
+                    },
+                    onError: (data) => {
+                        console.log(data);
+                    }
+                });
             } else {
-                await this.$inertia.post('/questions', this.newQuestion);
+                await this.$inertia.post('/questions', this.newQuestion, {
+                    onSuccess: (data) => {
+                        this.newQuestion = {
+                            question_text: '',
+                            question_rank: '',
+                            options: [{ text: '',next_question_id:'', recommendation: '' }]
+                        };
+                        this.error = data.props.flash.error || null;
+                        this.message = data.props.flash.message || null;
+                    },
+                    onError: (data) => {
+                        console.log(data);
+                    }
+                });
             }
             this.showModal = false;
             this.editing = false;
@@ -77,7 +112,8 @@ export default {
                 question_rank: '',
                 options: [{ text: '', next_question_id:'',recommendation: ''  }]
             },
-            messages: this.$page.props.flash || {}
+            message: null,
+            error: null
 
         };
     }
@@ -90,13 +126,13 @@ export default {
         <button @click="showModal = true" class="float-right bg-black hover:bg-black text-white py-2 px-4 rounded">Create Question</button>
     </div>
     <!-- Display success message -->
-    <div v-if="messages.message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">{{ messages.message }}</span>
+    <div v-if="message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline">{{ message }}</span>
     </div>
 
     <!-- Display error message -->
-    <div v-if="messages.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span class="block sm:inline">{{ messages.error }}</span>
+    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <span class="block sm:inline">{{ error }}</span>
     </div>
     <table class="min-w-full bg-white">
         <thead>

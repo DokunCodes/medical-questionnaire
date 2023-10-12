@@ -8,6 +8,7 @@ use App\Models\Option;
 use App\Models\Question;
 use App\Models\Recommendation;
 use App\Repositories\Contracts\QuestionnaireRepositoryInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class QuestionnaireController extends Controller
@@ -47,8 +48,11 @@ class QuestionnaireController extends Controller
 
             return redirect()->back()->with('message', 'Question and options added!');
         }
+        catch (QueryException $e){
+            return redirect()->back()->with('error', 'The ranking number already exist. Please try an unused number.');
+        }
         catch (\Exception $e){
-            return redirect()->back()->with('error', 'There was an error creating the question.');
+            return redirect()->back()->with('error', 'There was an error creating the question. ' . $e->getMessage());
         }
 
     }
