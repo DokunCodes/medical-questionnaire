@@ -35,7 +35,7 @@ The project is a questionnaire recommender system for people suffering from erec
 4. Create a database and update the .env file with the database credentials
 5. Run `php artisan migrate:fresh --seed`
 6. Run `php artisan serve`
-7. Run `npm run watch` to compile the assets
+7. Run `npm run dev` to compile the assets
 8. Visit `http://localhost:8000` to view the project
 9. Login with the following credentials:
     - Email: `admin@manual.co'
