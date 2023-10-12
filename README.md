@@ -45,3 +45,9 @@ The project is a questionnaire recommender system for people suffering from erec
     - Note: The admin user is seeded with the database
 
 
+## Steps to test Endpoints
+1. Open postman and fetch the following endpoints:
+2. METHOD:GET - `http://localhost:8000/api/v1/questionnaire`
+3. METHOD:POST - `http://localhost:8000/api/v1/recommendations`
+    Request Payload 
+   { "userOption": 31 }
